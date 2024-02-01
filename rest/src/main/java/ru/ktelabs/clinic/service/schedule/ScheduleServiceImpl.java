@@ -2,6 +2,7 @@ package ru.ktelabs.clinic.service.schedule;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
+import kte_labs_soap_web_service.GetScheduleResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -52,7 +53,9 @@ public class ScheduleServiceImpl implements ScheduleService {
         List<Schedule> schedules = new ArrayList<>();
         for (LocalDateTime recordingTime : recordingTimes) {
             Schedule schedule = new Schedule();
-
+            schedule.setDoctor(doctor);
+            schedule.setRecordingTime(recordingTime);
+            schedules.add(schedule);
         }
         return schedules;
     }

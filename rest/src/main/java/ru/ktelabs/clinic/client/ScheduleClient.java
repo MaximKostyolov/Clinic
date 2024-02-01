@@ -1,5 +1,7 @@
 package ru.ktelabs.clinic.client;
 
+import kte_labs_soap_web_service.GetScheduleRequest;
+import kte_labs_soap_web_service.GetScheduleResponse;
 import org.springframework.ws.client.core.support.WebServiceGatewaySupport;
 
 public class ScheduleClient  extends WebServiceGatewaySupport {
