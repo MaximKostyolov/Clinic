@@ -24,7 +24,7 @@ public class ScheduleEndpoint {
     @ResponsePayload
     public GetScheduleResponse getSchedule(@RequestPayload GetScheduleRequest request) {
         GetScheduleResponse response = new GetScheduleResponse();
-        response.setSchedules(scheduleSoapService.generateRecordsTime(request.getNewScheduleDto(), request.getDoctor()));
+        response.setRecordingTimes(scheduleSoapService.generateRecordsTime(request.getWorkingDays(), request.getDuration()));
 
         return response;
     }
