@@ -1,0 +1,40 @@
+version: "3.8"
+
+services:
+  clinic-database:
+    image: postgres:15.5-alpine
+    container_name: clinic-db
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=clinic
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=iamroot
+
+  soap:
+    build:
+      context: ./soap
+      dockerfile: dockerfile
+    image: soap-service
+    container_name: soap-service
+    ports:
+      - "9090:9090"
+    depends_on:
+      - clinic-db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://clinic-db:5432/clinic
+
+  rest:
+    build:
+      context: ./rest
+      dockerfile: dockerfile
+    image: rest-service
+    container_name: rest-service
+    ports:
+      - "8080:8080"
+    depends_on:
+      - clinic-db
+      - soap-service
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://clinic-db:5432/clinic
+      - SOAP_URL=http://soap-service:9090
