@@ -2,14 +2,12 @@ package ru.ktelabs.clinic.service.schedule;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
-import kte_labs_soap_web_service.GetScheduleResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.ktelabs.clinic.client.ScheduleClient;
 import ru.ktelabs.clinic.dto.schedule.NewScheduleDto;
 import ru.ktelabs.clinic.dto.schedule.ScheduleDeleteDto;
 import ru.ktelabs.clinic.dto.schedule.ScheduleParams;
@@ -23,7 +21,9 @@ import ru.ktelabs.clinic.repository.schedule.ScheduleRepository;
 import ru.ktelabs.clinic.service.doctor.DoctorService;
 import ru.ktelabs.clinic.service.patient.PatientService;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -39,13 +39,29 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     private final PatientService patientService;
 
-    private final ScheduleClient scheduleClient;
-
     @Override
     public List<Schedule> create(NewScheduleDto newScheduleDto) {
+        List<Schedule> schedules = new ArrayList<>();
         Doctor doctor = doctorService.getById(newScheduleDto.getDoctorId());
-        GetScheduleResponse response = scheduleClient.getSchedule(newScheduleDto, doctor);
-        return (List<Schedule>) response.getSchedules();
+        for (LocalDate date : newScheduleDto.getWorkDays()) {
+            LocalDateTime recordingTime = LocalDateTime.of(date.getYear(), date.getMonth(), date.getDayOfMonth(), 8, 0);
+            while (recordingTime.isBefore(LocalDateTime.of(date.getYear(), date.getMonth(), date.getDayOfMonth(), 13, 0))) {
+                Schedule schedule = new Schedule();
+                schedule.setDoctor(doctor);
+                schedule.setRecordingTime(recordingTime);
+                schedules.add(schedule);
+                recordingTime = recordingTime.plusMinutes(doctor.getSpecialization().getDuration());
+            }
+            recordingTime = LocalDateTime.of(date.getYear(), date.getMonth(), date.getDayOfMonth(), 14, 0);
+            while (recordingTime.isBefore(LocalDateTime.of(date.getYear(), date.getMonth(), date.getDayOfMonth(), 18, 0))) {
+                Schedule schedule = new Schedule();
+                schedule.setDoctor(doctor);
+                schedule.setRecordingTime(recordingTime);
+                schedules.add(schedule);
+                recordingTime = recordingTime.plusMinutes(doctor.getSpecialization().getDuration());
+            }
+        }
+        return scheduleRepository.saveAll(schedules);
     }
 
     @Override

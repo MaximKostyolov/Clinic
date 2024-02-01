@@ -113,29 +113,6 @@
             <version>${mapstruct.version}</version>
             <scope>provided</scope>
         </dependency>
-
-        <!-- tag::springws[] -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web-services</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>wsdl4j</groupId>
-            <artifactId>wsdl4j</artifactId>
-        </dependency>
-        <!-- end::springws[] -->
-
-        <dependency>
-            <groupId>jakarta.xml.bind</groupId>
-            <artifactId>jakarta.xml.bind-api</artifactId>
-            <version>4.0.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.glassfish.jaxb</groupId>
-            <artifactId>jaxb-runtime</artifactId>
-        </dependency>
     </dependencies>
 
     <build>
@@ -156,51 +133,6 @@
                     <compilerArgs>
                         <arg>-Amapstruct.defaultComponentModel=spring</arg>
                     </compilerArgs>
-                </configuration>
-            </plugin>
-
-            <!-- tag::xsd[] -->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>jaxb2-maven-plugin</artifactId>
-                <version>3.1.0</version>
-                <executions>
-                    <execution>
-                        <id>xjc</id>
-                        <goals>
-                            <goal>xjc</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <sources>
-                        <source>src/main/resources/schedule.xsd</source>
-                    </sources>
-                    <outputDirectory>src/main/java</outputDirectory>
-                    <clearOutputDir>false</clearOutputDir>
-                </configuration>
-            </plugin>
-            <!-- end::xsd[] -->
-            <plugin>
-                <groupId>org.jvnet.jaxb</groupId>
-                <artifactId>jaxb-maven-plugin</artifactId>
-                <version>4.0.0</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>generate</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <schemaLanguage>WSDL</schemaLanguage>
-                    <generateDirectory>${project.basedir}/src/main/java</generateDirectory>
-                    <generatePackage>ru.ktelabs.gen</generatePackage>
-                    <schemaDirectory>${project.basedir}/src/main/resources</schemaDirectory>
-                    <noFileHeader>true</noFileHeader>
-                    <schemaIncludes>
-                        <include>schedule.wsdl</include>
-                    </schemaIncludes>
                 </configuration>
             </plugin>
         </plugins>
