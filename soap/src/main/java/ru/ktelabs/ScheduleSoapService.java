@@ -1,22 +1,14 @@
 package ru.ktelabs;
 
-import kte_labs_soap_web_service.Doctor;
-import kte_labs_soap_web_service.NewScheduleDto;
-import kte_labs_soap_web_service.Schedule;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import ru.ktelabs.clinic.repository.schedule.ScheduleRepository;
+import org.springframework.stereotype.Component;
 
-import javax.xml.datatype.XMLGregorianCalendar;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-@Service
-@Transactional
+@Component
 public class ScheduleSoapService {
 
     public String generateRecordsTime(String workingDays, Integer duration) {

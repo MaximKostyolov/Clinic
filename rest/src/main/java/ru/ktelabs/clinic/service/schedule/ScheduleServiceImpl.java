@@ -2,7 +2,6 @@ package ru.ktelabs.clinic.service.schedule;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
-import kte_labs_soap_web_service.GetScheduleResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -48,7 +47,7 @@ public class ScheduleServiceImpl implements ScheduleService {
     public List<Schedule> create(NewScheduleDto newScheduleDto) {
         Doctor doctor = doctorService.getById(newScheduleDto.getDoctorId());
         String workingDays = convertWorkingDaysToString(newScheduleDto);
-        GetScheduleResponse response = scheduleClient.getSchedule(workingDays, doctor.getSpecialization().getDuration());
+        client.Gen.GetScheduleResponse response = scheduleClient.getSchedule(workingDays, doctor.getSpecialization().getDuration());
         List<LocalDateTime> recordingTimes = convertRecordingTimesFromString(response.getRecordingTimes());
         List<Schedule> schedules = new ArrayList<>();
         for (LocalDateTime recordingTime : recordingTimes) {
@@ -58,28 +57,6 @@ public class ScheduleServiceImpl implements ScheduleService {
             schedules.add(schedule);
         }
         return schedules;
-    }
-
-    private String convertWorkingDaysToString(NewScheduleDto newScheduleDto) {
-        String workingDays = "";
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-        for (LocalDate workingDay : newScheduleDto.getWorkDays()) {
-           workingDays = workingDays + workingDay.format(formatter) + "\n";
-        }
-        return workingDays;
-    }
-
-    private List<LocalDateTime> convertRecordingTimesFromString(String recordingTimes) {
-        List<LocalDateTime> recordTimes = new ArrayList<>();
-        String[] recordsRow = recordingTimes.split("\n");
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
-        for (String record : recordsRow) {
-            if (!record.isEmpty()) {
-                LocalDateTime recordTime = LocalDateTime.parse(record, formatter);
-                recordTimes.add(recordTime);
-            }
-        }
-        return recordTimes;
     }
 
     @Override
@@ -182,6 +159,28 @@ public class ScheduleServiceImpl implements ScheduleService {
         builder.and(Q_SCHEDULE.recordingTime.loe(endTime));
         Pageable pageable = PageRequest.of(0, 100, Sort.by("id").ascending());
         return scheduleRepository.findAll(builder, pageable).toList();
+    }
+
+    private String convertWorkingDaysToString(NewScheduleDto newScheduleDto) {
+        String workingDays = "";
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+        for (LocalDate workingDay : newScheduleDto.getWorkDays()) {
+            workingDays = workingDays + workingDay.format(formatter) + "\n";
+        }
+        return workingDays;
+    }
+
+    private List<LocalDateTime> convertRecordingTimesFromString(String recordingTimes) {
+        List<LocalDateTime> recordTimes = new ArrayList<>();
+        String[] recordsRow = recordingTimes.split("\n");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
+        for (String record : recordsRow) {
+            if (!record.isEmpty()) {
+                LocalDateTime recordTime = LocalDateTime.parse(record, formatter);
+                recordTimes.add(recordTime);
+            }
+        }
+        return recordTimes;
     }
 
 }

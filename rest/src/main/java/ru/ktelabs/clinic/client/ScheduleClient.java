@@ -1,19 +1,17 @@
 package ru.ktelabs.clinic.client;
 
-import kte_labs_soap_web_service.GetScheduleRequest;
-import kte_labs_soap_web_service.GetScheduleResponse;
 import org.springframework.ws.client.core.support.WebServiceGatewaySupport;
 
 public class ScheduleClient  extends WebServiceGatewaySupport {
 
-    public GetScheduleResponse getSchedule(String workingDay, Integer duration) {
+    public client.Gen.GetScheduleResponse getSchedule(String workingDay, Integer duration) {
 
-        GetScheduleRequest request = new GetScheduleRequest();
+        client.Gen.GetScheduleRequest request = new client.Gen.GetScheduleRequest();
 
         request.setWorkingDays(workingDay);
         request.setDuration(duration);
 
-        GetScheduleResponse response = (GetScheduleResponse) getWebServiceTemplate().marshalSendAndReceive(request);
+        client.Gen.GetScheduleResponse response = (client.Gen.GetScheduleResponse) getWebServiceTemplate().marshalSendAndReceive(request);
 
         return response;
     }
