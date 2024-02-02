@@ -1,9 +1,11 @@
 package ru.ktelabs.clinic.dto.schedule;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 
@@ -22,6 +24,8 @@ public class ScheduleResponseDto {
     @Schema(description = "Id пациента. Заполняется в случае записи пациента")
     private Long patientId;
 
+    @JsonFormat(pattern = "dd.MM.yyyy HH:mm")
+    @DateTimeFormat(pattern = "dd.MM.yyyy HH:mm")
     @Schema(description = "Время записи временного слота")
     private LocalDateTime recordingTime;
 

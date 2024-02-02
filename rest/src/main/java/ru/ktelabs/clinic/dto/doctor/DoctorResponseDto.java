@@ -22,7 +22,7 @@ public class DoctorResponseDto {
     private Long id;
 
     @Schema(description = "UUID врача")
-    private UUID uuid;
+    private String uuid;
 
     @Schema(description = "Имя врача")
     private String name;

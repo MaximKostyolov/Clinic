@@ -7,7 +7,6 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.id.IdentifierGenerator;
 
 import java.util.List;
-import java.util.UUID;
 
 @Entity
 @Table(name = "doctors")

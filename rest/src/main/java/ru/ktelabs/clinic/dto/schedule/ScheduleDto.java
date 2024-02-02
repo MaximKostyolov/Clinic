@@ -13,8 +13,8 @@ import java.time.LocalDate;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "Сущность удаления временных слотов для врача")
-public class ScheduleDeleteDto {
+@Schema(description = "Сущность удаления временных слотов для врача и поиска записей по id врача и дню")
+public class ScheduleDto {
 
     @NotNull(message = "Id врача не может быть пустым")
     @Min(value = 0, message = "Id врача не может быть меньше 0")

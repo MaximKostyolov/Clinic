@@ -8,7 +8,6 @@ import org.hibernate.id.IdentifierGenerator;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
-import java.util.UUID;
 
 @Entity
 @Table(name = "patients")
