@@ -1,6 +1,8 @@
 package ru.ktelabs.clinic.model.comment;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
+import org.springframework.format.annotation.DateTimeFormat;
 import ru.ktelabs.clinic.model.patient.Patient;
 import ru.ktelabs.clinic.model.doctor.Doctor;
 import lombok.*;
@@ -35,6 +37,8 @@ public class Comment {
     @JoinColumn(name = "patient_id", referencedColumnName = "id")
     private Patient patient;
 
+    @JsonFormat(pattern = "dd.MM.yyyy HH:mm")
+    @DateTimeFormat(pattern = "dd.MM.yyyy HH:mm")
     @Column(name = "created", nullable = false)
     private LocalDateTime created;
 

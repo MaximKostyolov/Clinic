@@ -20,7 +20,7 @@ import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.ktelabs.clinic.dto.schedule.NewScheduleDto;
-import ru.ktelabs.clinic.dto.schedule.ScheduleDeleteDto;
+import ru.ktelabs.clinic.dto.schedule.ScheduleDto;
 import ru.ktelabs.clinic.dto.schedule.ScheduleParams;
 import ru.ktelabs.clinic.dto.schedule.ScheduleResponseDto;
 import ru.ktelabs.clinic.mapper.schedule.ScheduleMapper;
@@ -134,6 +134,28 @@ public class ScheduleController {
     }
 
     @Operation(
+            summary = "Получить временные слоты по Id врача и дню",
+            description = "Конечная точка для получения временных слотов по Id врача и дню"
+    )
+    @ApiResponses(value = {@ApiResponse(
+            responseCode = "200",
+            description = "Получены временные слоты по Id врача и дню",
+            content = {@Content(
+                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    array = @ArraySchema(schema = @Schema(implementation = ScheduleResponseDto.class))
+            )}
+    )})
+    @GetMapping("/doctor")
+    public List<ScheduleResponseDto> getByDoctorIdAndDay(@RequestBody @Valid
+                                       @Parameter(description = "Id врача и день") ScheduleDto scheduleDto,
+                                       HttpServletRequest request) {
+        log.info("Получен запрос к эндпоинту: '{} {}', Строка параметров запроса: '{}'",
+                request.getMethod(), request.getRequestURI(), request.getQueryString());
+        Schedule schedule = scheduleService.getByDoctorIdAndDay(scheduleDto);
+        return scheduleMapper.toScheduleResponseDto(schedule);
+    }
+
+    @Operation(
             summary = "Удалить временной слот врача по Id",
             description = "Конечная точка для удаления временного слота врача по Id"
     )
@@ -161,10 +183,10 @@ public class ScheduleController {
     @DeleteMapping()
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@RequestBody @Valid @Parameter(description = "Данные для удаления временных слотов врача")
-                       ScheduleDeleteDto scheduleDeleteDto, HttpServletRequest request) {
+                       ScheduleDto scheduleDto, HttpServletRequest request) {
         log.info("Получен запрос к эндпоинту: '{} {}', Строка параметров запроса: '{}'",
                 request.getMethod(), request.getRequestURI(), request.getQueryString());
-        scheduleService.delete(scheduleDeleteDto);
+        scheduleService.delete(scheduleDto);
     }
 
     @Operation(

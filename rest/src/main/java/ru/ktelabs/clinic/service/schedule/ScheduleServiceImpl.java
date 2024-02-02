@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.ktelabs.clinic.client.ScheduleClient;
 import ru.ktelabs.clinic.dto.schedule.NewScheduleDto;
-import ru.ktelabs.clinic.dto.schedule.ScheduleDeleteDto;
+import ru.ktelabs.clinic.dto.schedule.ScheduleDto;
 import ru.ktelabs.clinic.dto.schedule.ScheduleParams;
 import ru.ktelabs.clinic.exception.AccesErrorException;
 import ru.ktelabs.clinic.exception.NotFoundException;
@@ -107,8 +107,8 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Override
-    public void delete(ScheduleDeleteDto scheduleDeleteDto) {
-        List<Schedule> schedules = findByDoctorIdAndDay(scheduleDeleteDto);
+    public void delete(ScheduleDto scheduleDto) {
+        List<Schedule> schedules = findByDoctorIdAndDay(scheduleDto);
         if (!schedules.isEmpty()) {
             scheduleRepository.deleteAll(schedules);
         } else {
@@ -121,6 +121,11 @@ public class ScheduleServiceImpl implements ScheduleService {
         Predicate p = buildQSchedulePredicateByParams(params);
         Pageable pageable = PageRequest.of(page, size, Sort.by("recordTime").ascending());
         return scheduleRepository.findAll(p, pageable).toList();
+    }
+
+    @Override
+    public Schedule getByDoctorIdAndDay(ScheduleDto scheduleDto) {
+        return findByDoctorIdAndDay(scheduleDto);
     }
 
     private Predicate buildQSchedulePredicateByParams(ScheduleParams params) {
@@ -148,13 +153,13 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
 
-    private List<Schedule> findByDoctorIdAndDay(ScheduleDeleteDto scheduleDeleteDto) {
-        LocalDateTime startTime = LocalDateTime.of(scheduleDeleteDto.getDay().getYear(),
-                scheduleDeleteDto.getDay().getMonth(), scheduleDeleteDto.getDay().getDayOfMonth(), 7, 59);
-        LocalDateTime endTime = LocalDateTime.of(scheduleDeleteDto.getDay().getYear(),
-                scheduleDeleteDto.getDay().getMonth(), scheduleDeleteDto.getDay().getDayOfMonth(), 18, 1);
+    private List<Schedule> findByDoctorIdAndDay(ScheduleDto scheduleDto) {
+        LocalDateTime startTime = LocalDateTime.of(scheduleDto.getDay().getYear(),
+                scheduleDto.getDay().getMonth(), scheduleDto.getDay().getDayOfMonth(), 7, 59);
+        LocalDateTime endTime = LocalDateTime.of(scheduleDto.getDay().getYear(),
+                scheduleDto.getDay().getMonth(), scheduleDto.getDay().getDayOfMonth(), 18, 1);
         BooleanBuilder builder = new BooleanBuilder();
-        builder.and(Q_SCHEDULE.doctor.id.eq(scheduleDeleteDto.getDoctorId()));
+        builder.and(Q_SCHEDULE.doctor.id.eq(scheduleDto.getDoctorId()));
         builder.and(Q_SCHEDULE.recordingTime.goe(startTime));
         builder.and(Q_SCHEDULE.recordingTime.loe(endTime));
         Pageable pageable = PageRequest.of(0, 100, Sort.by("id").ascending());

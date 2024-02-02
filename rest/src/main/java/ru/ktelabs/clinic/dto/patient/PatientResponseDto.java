@@ -20,7 +20,7 @@ public class PatientResponseDto {
     private Long id;
 
     @Schema(description = "UUID пациента")
-    private UUID uuid;
+    private String uuid;
 
     @Schema(description = "Фамилия Имя Отчество пациента")
     private String name;
