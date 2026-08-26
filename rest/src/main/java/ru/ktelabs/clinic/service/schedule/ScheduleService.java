@@ -23,6 +23,6 @@ public interface ScheduleService {
 
     List<Schedule> getAll(ScheduleParams params, int page, int size);
 
-    Schedule getByDoctorIdAndDay(ScheduleDto scheduleDto);
+    List<Schedule> getByDoctorIdAndDay(ScheduleDto scheduleDto);
 
 }
