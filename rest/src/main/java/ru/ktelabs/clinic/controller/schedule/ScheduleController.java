@@ -151,8 +151,8 @@ public class ScheduleController {
                                        HttpServletRequest request) {
         log.info("Получен запрос к эндпоинту: '{} {}', Строка параметров запроса: '{}'",
                 request.getMethod(), request.getRequestURI(), request.getQueryString());
-        Schedule schedule = scheduleService.getByDoctorIdAndDay(scheduleDto);
-        return scheduleMapper.toScheduleResponseDto(schedule);
+        List<Schedule> schedule = scheduleService.getByDoctorIdAndDay(scheduleDto);
+        return scheduleMapper.toScheduleResponseDtos(schedule);
     }
 
     @Operation(

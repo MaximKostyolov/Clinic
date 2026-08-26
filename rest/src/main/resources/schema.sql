@@ -1,5 +1,3 @@
-drop table if exists doctors, patients, comments, schedules;
-
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 CREATE TABLE IF NOT EXISTS doctors (

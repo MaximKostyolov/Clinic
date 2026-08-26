@@ -8,7 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.ktelabs.clinic.client.ScheduleClient;
+import ru.ktelabs.client.generated.*;
 import ru.ktelabs.clinic.dto.schedule.NewScheduleDto;
 import ru.ktelabs.clinic.dto.schedule.ScheduleDto;
 import ru.ktelabs.clinic.dto.schedule.ScheduleParams;
@@ -27,6 +27,9 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+
+import static ru.ktelabs.clinic.DateUtils.DATE_TIME_FORMATTER;
 
 @Service
 @Transactional
@@ -41,14 +44,19 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     private final PatientService patientService;
 
-    private final ScheduleClient scheduleClient;
+    private final ru.ktelabs.client.generated.ScheduleService scheduleClient;
 
     @Override
     public List<Schedule> create(NewScheduleDto newScheduleDto) {
         Doctor doctor = doctorService.getById(newScheduleDto.getDoctorId());
         String workingDays = convertWorkingDaysToString(newScheduleDto);
-        client.Gen.GetScheduleResponse response = scheduleClient.getSchedule(workingDays, doctor.getSpecialization().getDuration());
-        List<LocalDateTime> recordingTimes = convertRecordingTimesFromString(response.getRecordingTimes());
+
+        GetSchedule.ScheduleRequest scheduleRequest = new GetSchedule.ScheduleRequest();
+        scheduleRequest.setDuration(doctor.getSpecialization().getDuration());
+        scheduleRequest.setWorkingDays(workingDays);
+
+        GetScheduleResponse.ScheduleResponse response = scheduleClient.getSchedule(scheduleRequest);
+        List<LocalDateTime> recordingTimes = convertRecordingTimesFromString(response);
         List<Schedule> schedules = new ArrayList<>();
         for (LocalDateTime recordingTime : recordingTimes) {
             Schedule schedule = new Schedule();
@@ -56,6 +64,8 @@ public class ScheduleServiceImpl implements ScheduleService {
             schedule.setRecordingTime(recordingTime);
             schedules.add(schedule);
         }
+        scheduleRepository.saveAll(schedules);
+
         return schedules;
     }
 
@@ -79,7 +89,7 @@ public class ScheduleServiceImpl implements ScheduleService {
     @Override
     public Schedule update(Long id, Long patientId, Boolean isSuccesful) {
         Schedule schedule = getById(id);
-        if (schedule.getPatient().getId() == patientId) {
+        if (Objects.equals(schedule.getPatient().getId(), patientId)) {
             if (schedule.getRecordingTime().isBefore(LocalDateTime.now())) {
                 schedule.setIsSuccessful(isSuccesful);
                 return scheduleRepository.save(schedule);
@@ -124,7 +134,7 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Override
-    public Schedule getByDoctorIdAndDay(ScheduleDto scheduleDto) {
+    public List<Schedule> getByDoctorIdAndDay(ScheduleDto scheduleDto) {
         return findByDoctorIdAndDay(scheduleDto);
     }
 
@@ -167,21 +177,20 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     private String convertWorkingDaysToString(NewScheduleDto newScheduleDto) {
-        String workingDays = "";
+        StringBuilder workingDays = new StringBuilder();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
         for (LocalDate workingDay : newScheduleDto.getWorkDays()) {
-            workingDays = workingDays + workingDay.format(formatter) + "\n";
+            workingDays.append(workingDay.format(formatter)).append(System.lineSeparator());
         }
-        return workingDays;
+        return workingDays.toString();
     }
 
-    private List<LocalDateTime> convertRecordingTimesFromString(String recordingTimes) {
+    private List<LocalDateTime> convertRecordingTimesFromString(GetScheduleResponse.ScheduleResponse response) {
         List<LocalDateTime> recordTimes = new ArrayList<>();
-        String[] recordsRow = recordingTimes.split("\n");
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
+        String[] recordsRow = response.getRecordingTimes().split(System.lineSeparator());
         for (String record : recordsRow) {
             if (!record.isEmpty()) {
-                LocalDateTime recordTime = LocalDateTime.parse(record, formatter);
+                LocalDateTime recordTime = LocalDateTime.parse(record, DATE_TIME_FORMATTER);
                 recordTimes.add(recordTime);
             }
         }
