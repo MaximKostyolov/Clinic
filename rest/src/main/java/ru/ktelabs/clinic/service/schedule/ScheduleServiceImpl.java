@@ -31,6 +31,8 @@ import java.util.Objects;
 
 import static ru.ktelabs.clinic.DateUtils.DATE_TIME_FORMATTER;
 
+import static ru.ktelabs.clinic.DateUtils.DATE_TIME_FORMATTER;
+
 @Service
 @Transactional
 @RequiredArgsConstructor
